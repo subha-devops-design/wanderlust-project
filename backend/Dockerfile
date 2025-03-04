@@ -1,30 +1,19 @@
-# Base image for Backend
-FROM node:21 AS backend-builder
+# Base image for backend
+FROM node:21 
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Code
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
+
+# Install required dependencies
+RUN npm install
+
+# Copy the rest of the application code to the working directory
 COPY . .
-
-# Packages the installed 
-RUN npm i 
-
-# test
-RUN npm run test
-
-# stage 2 
-FROM node:21-slim
-
-# setup the working directory 
-WORKDIR /app
-
-# Copy the above stage as compressed
-COPY --from=backend-builder /app .
-
-COPY .env.docker .env
-
-#Expose the port 
+COPY .env.sample .env
+# Expose the port the app runs on
 EXPOSE 5000
 
 # Command to start the backend server
